@@ -25,7 +25,13 @@ namespace TestViaApi
             if (databases.Count > 0)
             {
                 var db = databases[1];
-                GetCollectionsForDatabase(db, apiKey);
+                var colls = GetCollectionsForDatabase(db, apiKey);
+
+                if (colls.Count > 0)
+                {
+                    var c = colls[1];
+                    var docs = GetDocumentsFromCollection(db, c, apiKey);
+                }
             }
         }
 
@@ -98,6 +104,18 @@ namespace TestViaApi
             return response.Data;
         }
 
+        private static DocumentList GetDocumentsFromCollection(Database db, Collection c, string key)
+        {
+            var client = new RestClient(BASE_URI);
+            var request = new RestRequest("/1.0/collections/" + db.name + "/" + c.collection, Method.GET);
+            // Add HTTP header for the API key
+            request.AddHeader("apikey", key);
+
+            // Iterate the response, which is an array of Database object references
+            IRestResponse<DocumentList> response = client.Execute<DocumentList>(request);
+            Console.WriteLine("There are {0} documents detailed in the response for {1}", response.Data.Count, c.collection);
+            return response.Data;
+        }
     }
 
 }
