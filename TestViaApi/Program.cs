@@ -8,7 +8,7 @@ namespace TestViaApi
         private static string usr = "USER EMAIL HERE";
         private static string pwd = "USER PASSWORD HERE";
 
-        // This is the production endpoint for LDC Via
+        // LDC Via endpoint here
         const string BASE_URI = "https://eu.ldcvia.com";
 
         /// <summary>
@@ -20,7 +20,13 @@ namespace TestViaApi
         {
             var apiKey = GetUserKey();
             Console.WriteLine("Retrieved API key for '{0}': {1}", usr, apiKey);
-            GetDatabaseList(apiKey);
+
+            var databases = GetDatabaseList(apiKey);
+            if (databases.Count > 0)
+            {
+                var db = databases[1];
+                GetCollectionsForDatabase(db, apiKey);
+            }
         }
 
         /// <summary>
@@ -40,10 +46,11 @@ namespace TestViaApi
         }
 
         /// <summary>
-        /// Given a valid API key, retrieves a database list from the LDC Via API
+        /// Given a valid API key, retrieves a database list from the LDC Via API.
         /// </summary>
-        /// <param name="key"></param>
-        private static void GetDatabaseList(string key)
+        /// <param name="key">API key to use for call</param>
+        /// <returns>DatabaseList from response</returns>
+        private static DatabaseList GetDatabaseList(string key)
         {
             var client = new RestClient(BASE_URI);
             var request = new RestRequest("/1.0/databases", Method.GET);
@@ -61,6 +68,34 @@ namespace TestViaApi
                 Console.WriteLine("Database #{0} is called {1}", i, db.title);
             }
 
+            return response.Data;
+        }
+
+        /// <summary>
+        /// Given a database reference and a valid API key, retrieves a collection list from the LDC Via API
+        /// </summary>
+        /// <param name="db">Database reference to query</param>
+        /// <param name="key">API key to use for call</param>
+        /// <returns>CollectionList from Database</returns>
+        private static CollectionList GetCollectionsForDatabase(Database db, string key)
+        {
+            var client = new RestClient(BASE_URI);
+            var request = new RestRequest("/1.0/collections/" + db.name, Method.GET);
+            // Add HTTP header for the API key
+            request.AddHeader("apikey", key);
+
+            // Iterate the response, which is an array of Database object references
+            IRestResponse<CollectionList> response = client.Execute<CollectionList>(request);
+            Console.WriteLine("There are {0} collections detailed in the response for {1}", response.Data.Count, db.name);
+
+            int i = 0;
+            foreach (Collection c in response.Data)
+            {
+                i++;
+                Console.WriteLine("Collection #{0} is called {1}", i, c.collection);
+            }
+
+            return response.Data;
         }
 
     }
