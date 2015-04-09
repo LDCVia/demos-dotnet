@@ -1,0 +1,37 @@
+packages
+
+# Ignore Windows thumbnails
+Thumbs.db
+
+# Ignore VS build files
+*.obj
+*.pdb
+*.user
+*.aps
+*.pch
+*.vspscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.bak
+*.cache
+*.ilk
+*.log
+[Bb]in
+[Dd]ebug*/
+*.lib
+*.sbr
+obj/
+_ReSharper*/
+[Tt]est[Rr]esult*
+Examples*/
+SerializerTest*/
+*.csproj.user
+*.resharper*
+
+# Ignore MonoDevelop files
+*.pidb
+*.userprefs
